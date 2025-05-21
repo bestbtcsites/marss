@@ -16,24 +16,27 @@
       padding: 40px 20px;
     }
 
-    .info-row {
+    .info-bar {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
+      flex-direction: row;
+      background: #1f1f1f;
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      font-size: 1.2em;
       width: 100%;
-      max-width: 900px;
-      margin-bottom: 20px;
+      max-width: 600px;
+      margin-bottom: 30px;
     }
 
     .info-section {
-      flex: 1 1 200px;
+      flex: 1;
+      padding: 20px;
       text-align: center;
-      background: #1f1f1f;
-      padding: 15px 25px;
-      border-radius: 8px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.5);
-      min-width: 150px;
+    }
+
+    .info-section:not(:last-child) {
+      border-right: 1px solid #333;
     }
 
     .label {
@@ -51,54 +54,34 @@
 
     .progress-container {
       width: 100%;
-      max-width: 900px;
-      background-color: #e0e0e0; /* Açık gri */
+      max-width: 600px;
+      background-color: #e0e0e0; /* Açık gri boş alan */
       border-radius: 5px;
       overflow: hidden;
-      margin-top: 15px;
+      position: relative;
+      height: 26px;
+      margin-bottom: 20px;
     }
 
     .progress-bar {
-      height: 30px;
+      height: 100%;
       text-align: center;
-      line-height: 30px;
+      line-height: 26px;
       font-weight: bold;
-      transition: width 0.4s ease, background-color 0.4s ease;
       color: #121212;
+      transition: width 0.4s ease, background-color 0.4s ease;
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 5px 0 0 5px;
       white-space: nowrap;
-    }
-
-    /* RESPONSIVE TASARIM */
-    @media (max-width: 768px) {
-      .info-row {
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-      }
-
-      .info-section {
-        width: 90%;
-      }
-
-      .progress-container {
-        width: 90%;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .value {
-        font-size: 1.2em;
-      }
-
-      .progress-bar {
-        font-size: 0.9em;
-      }
+      padding-left: 10px;
     }
   </style>
 </head>
 <body>
 
-  <div class="info-row">
+  <div class="info-bar">
     <div class="info-section">
       <span class="label">Payout Ratio</span>
       <span id="roi" class="value">--%</span>
@@ -109,17 +92,6 @@
     </div>
   </div>
 
-  <div class="info-row">
-    <div class="info-section">
-      <span class="label">Daily ROI Growth</span>
-      <span id="daily" class="value">--%</span>
-    </div>
-    <div class="info-section">
-      <span class="label">Estimated 100% Date</span>
-      <span id="estimate" class="value">--</span>
-    </div>
-  </div>
-
   <div class="progress-container">
     <div id="progress-bar" class="progress-bar">0%</div>
   </div>
@@ -127,30 +99,20 @@
   <script>
     const startDate = new Date("2025-05-18");
     const today = new Date();
-    const oneDay = 1000 * 60 * 60 * 24;
-    const daysElapsed = Math.floor((today - startDate) / oneDay) + 1;
+    const daysElapsed = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+    const payoutRatio = (0.52 * daysElapsed).toFixed(2);
 
-    const dailyGrowth = 0.52; // %0.52 günlük ROI artışı
-    const currentROI = (dailyGrowth * daysElapsed).toFixed(2);
-
-    document.getElementById("roi").innerText = currentROI + "%";
+    document.getElementById("roi").innerText = payoutRatio + "%";
     document.getElementById("days").innerText = daysElapsed + " Days";
-    document.getElementById("daily").innerText = dailyGrowth.toFixed(2) + "%";
 
-    const estimatedDays = Math.ceil(100 / dailyGrowth);
-    const estimatedDate = new Date(startDate.getTime() + (estimatedDays * oneDay));
-    const estimateStr = estimatedDate.toISOString().split("T")[0];
-    document.getElementById("estimate").innerText = estimateStr;
-
-    // Progress bar
     const progressBar = document.getElementById("progress-bar");
-    const visualWidth = Math.min(currentROI, 100);
+    const visualWidth = Math.min(payoutRatio, 100);
     progressBar.style.width = visualWidth + "%";
-    progressBar.innerText = currentROI + "%";
+    progressBar.innerText = payoutRatio + "%";
 
-    // Renk ayarı
-    const ratio = parseFloat(currentROI);
-    if (ratio < 50) {
+    // Renk belirleme
+    const ratio = parseFloat(payoutRatio);
+    if (ratio <= 50) {
       progressBar.style.backgroundColor = "#ffeb3b"; // Sarı
       progressBar.style.color = "#000";
     } else if (ratio < 100) {
