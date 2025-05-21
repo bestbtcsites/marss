@@ -51,7 +51,7 @@
     .progress-container {
       width: 100%;
       max-width: 800px;
-      background-color: #2c2c2c;
+      background-color: #e0e0e0; /* Açık gri renk (güncellendi) */
       border-radius: 5px;
       overflow: hidden;
       margin-top: 15px;
@@ -97,12 +97,12 @@
   </div>
 
   <script>
-    const startDate = new Date("2025-05-18");
+    const startDate = new Date("2025-05-09");
     const today = new Date();
     const oneDay = 1000 * 60 * 60 * 24;
     const daysElapsed = Math.floor((today - startDate) / oneDay) + 1;
 
-    const dailyGrowth = 0.52; // %0.80 günlük ROI artışı
+    const dailyGrowth = 0.8; // %0.80 günlük ROI artışı
     const currentROI = (dailyGrowth * daysElapsed).toFixed(2);
 
     document.getElementById("roi").innerText = currentROI + "%";
