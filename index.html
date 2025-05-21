@@ -18,15 +18,16 @@
 
     .info-row {
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
-      gap: 60px;
+      gap: 20px;
       width: 100%;
-      max-width: 800px;
+      max-width: 900px;
       margin-bottom: 20px;
     }
 
     .info-section {
-      flex: 1 1 auto;
+      flex: 1 1 200px;
       text-align: center;
       background: #1f1f1f;
       padding: 15px 25px;
@@ -50,8 +51,8 @@
 
     .progress-container {
       width: 100%;
-      max-width: 800px;
-      background-color: #e0e0e0; /* Açık gri renk (güncellendi) */
+      max-width: 900px;
+      background-color: #e0e0e0; /* Açık gri */
       border-radius: 5px;
       overflow: hidden;
       margin-top: 15px;
@@ -65,6 +66,33 @@
       transition: width 0.4s ease, background-color 0.4s ease;
       color: #121212;
       white-space: nowrap;
+    }
+
+    /* RESPONSIVE TASARIM */
+    @media (max-width: 768px) {
+      .info-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .info-section {
+        width: 90%;
+      }
+
+      .progress-container {
+        width: 90%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .value {
+        font-size: 1.2em;
+      }
+
+      .progress-bar {
+        font-size: 0.9em;
+      }
     }
   </style>
 </head>
@@ -97,12 +125,12 @@
   </div>
 
   <script>
-    const startDate = new Date("2025-05-09");
+    const startDate = new Date("2025-05-18");
     const today = new Date();
     const oneDay = 1000 * 60 * 60 * 24;
     const daysElapsed = Math.floor((today - startDate) / oneDay) + 1;
 
-    const dailyGrowth = 0.8; // %0.80 günlük ROI artışı
+    const dailyGrowth = 0.52; // %0.52 günlük ROI artışı
     const currentROI = (dailyGrowth * daysElapsed).toFixed(2);
 
     document.getElementById("roi").innerText = currentROI + "%";
@@ -116,7 +144,7 @@
 
     // Progress bar
     const progressBar = document.getElementById("progress-bar");
-    const visualWidth = Math.min(currentROI, 100);  // Maksimum 100% genişlik
+    const visualWidth = Math.min(currentROI, 100);
     progressBar.style.width = visualWidth + "%";
     progressBar.innerText = currentROI + "%";
 
