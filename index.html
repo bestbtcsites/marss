@@ -1,69 +1,138 @@
-<style>
-  .container {
-    display: flex;
-    font-family: Arial, sans-serif;
-    margin: 5px 0;
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ROI Monitor</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: #121212;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
 
-  table {
-    border-collapse: collapse;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    width: 750px; /* eşit genişlik */
-    height: 5px;
-    text-align: center;
-    margin: 0; /* boşlukları sıfırla */
-  }
+    .info-row {
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      width: 100%;
+      max-width: 800px;
+      margin-bottom: 20px;
+    }
 
-  /* İkinci tabloya sola sınır ekleyerek ayrım koyabiliriz */
-  table + table {
-    border-left: 2px solid #ccc;
-  }
+    .info-section {
+      flex: 1 1 auto;
+      text-align: center;
+      background: #1f1f1f;
+      padding: 15px 25px;
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.5);
+      min-width: 150px;
+    }
 
-  td {
-    padding: 12px 20px;
-    font-size: 1.2em;
-    vertical-align: middle;
-    color: #333;
-  }
+    .label {
+      display: block;
+      color: #aaa;
+      font-size: 0.9em;
+      margin-bottom: 6px;
+    }
 
-  .green-bold {
-    color: green;
-    font-weight: bold;
-  }
-</style>
+    .value {
+      font-weight: bold;
+      color: #00e676;
+      font-size: 1.4em;
+    }
 
-<div class="container">
-  <table>
-    <tr>
-      <td>Payout Ratio: <span id="roi" class="green-bold"></span></td>
-    </tr>
-  </table>
+    .progress-container {
+      width: 100%;
+      max-width: 800px;
+      background-color: #2c2c2c;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
 
-  <table>
-    <tr>
-      <td>Monitored: <span id="days" class="green-bold"></span></td>
-    </tr>
-  </table>
-</div>
+    .progress-bar {
+      height: 30px;
+      text-align: center;
+      line-height: 30px;
+      font-weight: bold;
+      transition: width 0.4s ease, background-color 0.4s ease;
+      color: #121212;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
 
-<script>
-  window.onload = function () {
-    const roiDailyIncrease = 0.52;
+  <div class="info-row">
+    <div class="info-section">
+      <span class="label">Payout Ratio</span>
+      <span id="roi" class="value">--%</span>
+    </div>
+    <div class="info-section">
+      <span class="label">Monitored</span>
+      <span id="days" class="value">-- Days</span>
+    </div>
+  </div>
 
-    const roiStartDate = new Date("2025-05-18");
-    const daysStartDate = new Date("2025-05-18");
+  <div class="info-row">
+    <div class="info-section">
+      <span class="label">Daily ROI Growth</span>
+      <span id="daily" class="value">--%</span>
+    </div>
+    <div class="info-section">
+      <span class="label">Estimated 100% Date</span>
+      <span id="estimate" class="value">--</span>
+    </div>
+  </div>
 
+  <div class="progress-container">
+    <div id="progress-bar" class="progress-bar">0%</div>
+  </div>
+
+  <script>
+    const startDate = new Date("2025-05-18");
     const today = new Date();
+    const oneDay = 1000 * 60 * 60 * 24;
+    const daysElapsed = Math.floor((today - startDate) / oneDay) + 1;
 
-    const roiDiffTime = today - roiStartDate;
-    const roiDiffDays = Math.floor(roiDiffTime / (1000 * 60 * 60 * 24));
+    const dailyGrowth = 0.52; // %0.80 günlük ROI artışı
+    const currentROI = (dailyGrowth * daysElapsed).toFixed(2);
 
-    const daysDiffTime = today - daysStartDate;
-    const daysDiffDays = Math.floor(daysDiffTime / (1000 * 60 * 60 * 24));
-
-    const currentROI = roiDailyIncrease * (roiDiffDays + 1);
     document.getElementById("roi").innerText = currentROI + "%";
+    document.getElementById("days").innerText = daysElapsed + " Days";
+    document.getElementById("daily").innerText = dailyGrowth.toFixed(2) + "%";
 
-    document.getElementById("days").innerText = (daysDiffDays + 1) + " Days";
-  };
-</script>
+    const estimatedDays = Math.ceil(100 / dailyGrowth);
+    const estimatedDate = new Date(startDate.getTime() + (estimatedDays * oneDay));
+    const estimateStr = estimatedDate.toISOString().split("T")[0];
+    document.getElementById("estimate").innerText = estimateStr;
+
+    // Progress bar
+    const progressBar = document.getElementById("progress-bar");
+    const visualWidth = Math.min(currentROI, 100);  // Maksimum 100% genişlik
+    progressBar.style.width = visualWidth + "%";
+    progressBar.innerText = currentROI + "%";
+
+    // Renk ayarı
+    const ratio = parseFloat(currentROI);
+    if (ratio < 50) {
+      progressBar.style.backgroundColor = "#ffeb3b"; // Sarı
+      progressBar.style.color = "#000";
+    } else if (ratio < 100) {
+      progressBar.style.backgroundColor = "#ff9800"; // Turuncu
+      progressBar.style.color = "#000";
+    } else {
+      progressBar.style.backgroundColor = "#00e676"; // Yeşil
+      progressBar.style.color = "#121212";
+    }
+  </script>
+
+</body>
+</html>
